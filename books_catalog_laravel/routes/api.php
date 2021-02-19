@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+Route::get('authors', [AuthorController::class, 'index']);
+Route::get('author/{author}', [AuthorController::class, 'show']);
+Route::post('author', [AuthorController::class, 'store']);
+Route::put('author/{author}', [AuthorController::class, 'update']);
+Route::delete('author/{author}', [AuthorController::class, 'destroy']);
+
+Route::get('books', [BookController::class, 'index']);
+Route::get('book/{book}', [BookController::class, 'show']);
+Route::post('book', [BookController::class, 'store']);
+Route::put('book/{book}', [BookController::class, 'update']);
+Route::delete('book/{book}', [BookController::class, 'destroy']);

@@ -10,21 +10,26 @@ class AuthorController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        $book_id = $request->query('book_id');
+        $size = $request->query('size');
+        $query = Author::query();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        if ($book_id) {
+            $query = $query->whereHas('books', function ($q) use ($book_id){
+                $q->where('books.id', $book_id);
+            });
+        }
+
+        if ($size) {
+            return $query->paginate($size);
+        }
+
+        return $query->get();
     }
 
     /**
@@ -35,7 +40,8 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $author = Author::create($request->all()/*->validated()*/);
+        return $author;
     }
 
     /**
@@ -46,18 +52,7 @@ class AuthorController extends Controller
      */
     public function show(Author $author)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Author  $author
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Author $author)
-    {
-        //
+        return $author;
     }
 
     /**
@@ -69,17 +64,23 @@ class AuthorController extends Controller
      */
     public function update(Request $request, Author $author)
     {
-        //
+//        $author->fill($request->except(['id']));
+//        $author->save();
+        $author->update($request->all());
+        return $author;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Author  $author
+     * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Author $author)
     {
-        //
+        if ($author->delete()) {
+            return response(null, 204);
+        }
     }
 }

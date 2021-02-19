@@ -15,27 +15,23 @@ class BooksTableSeeder extends Seeder
      */
     public function run()
     {
-        // Удалим имеющиеся в таблице данные
-        Author::truncate();
         Book::truncate();
 
         $faker = \Faker\Factory::create();
 
-        for ($i = 0; $i < 5; $i++) {
-            Author::create([
-                'surname' => $faker->lastName,
-                'name' => $faker->firstName,
-                'birth_year' => $faker->year,
-            ]);
-        }
+//        \App\Models\Book::factory()->count(10)->create();
 
         for ($i = 0; $i < 10; $i++) {
             Book::create([
                 'name' => $faker->sentence,
                 'publication_year' => $faker->year,
                 'summary' => $faker->paragraph,
-                'author_id' => $faker->randomElement([1, 2, 3, 4, 5]),
             ]);
+        }
+
+        foreach (Book::all() as $book) {
+            $authors = Author::inRandomOrder()->take(rand(1,3))->pluck('id');
+            $book->authors()->attach($authors);
         }
     }
 }
