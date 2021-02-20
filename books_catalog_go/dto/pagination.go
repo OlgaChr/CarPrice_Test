@@ -1,4 +1,4 @@
-package types
+package dto
 
 type Pagination struct {
 	Size uint

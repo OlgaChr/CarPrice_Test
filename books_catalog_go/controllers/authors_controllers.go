@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"books_catalog_go/dto"
 	"books_catalog_go/models"
-	"books_catalog_go/types"
 	u "books_catalog_go/utils"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -66,9 +66,14 @@ var GetAuthor = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := models.GetAuthor(uint(id))
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
+	if data != nil {
+		resp := u.Message(true, "success")
+		resp["data"] = data
+		u.Respond(w, resp)
+	} else {
+		resp := u.Message(false, "error")
+		u.Respond(w, resp)
+	}
 }
 
 var GetAuthors = func(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +84,7 @@ var GetAuthors = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var GetAuthorsWithSearch = func(w http.ResponseWriter, r *http.Request) {
-	authorCondition := &types.AuthorCondition{}
+	authorCondition := &dto.AuthorCondition{}
 	err := json.NewDecoder(r.Body).Decode(authorCondition)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"))
@@ -87,7 +92,12 @@ var GetAuthorsWithSearch = func(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := models.GetAuthorsWithSearch(authorCondition)
-	resp := u.Message(true, "success")
-	resp["data"] = data
-	u.Respond(w, resp)
+	if data != nil {
+		resp := u.Message(true, "success")
+		resp["data"] = data
+		u.Respond(w, resp)
+	} else {
+		resp := u.Message(false, "error")
+		u.Respond(w, resp)
+	}
 }

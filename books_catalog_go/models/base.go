@@ -33,10 +33,10 @@ func init() {
 
 	db = conn
 	db.AutoMigrate(&Book{}, &Author{}) //Миграция базы данных
-	db.Model(&Book{}).AddForeignKey("author_id", "authors(id)", "CASCADE", "CASCADE")
+	//db.Model(&Book{}).AddForeignKey("author_id", "authors(id)", "CASCADE", "CASCADE")
 
-	// db.Table("authors_books").AddForeignKey("author_id", "authors(id)", "RESTRICT", "RESTRICT")
-	// db.Table("authors_books").AddForeignKey("book_id", "books(id)", "RESTRICT", "RESTRICT")
+	db.Table("authors_books").AddForeignKey("author_id", "authors(id)", "RESTRICT", "RESTRICT")
+	db.Table("authors_books").AddForeignKey("book_id", "books(id)", "RESTRICT", "RESTRICT")
 }
 
 // возвращает дескриптор объекта DB

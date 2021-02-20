@@ -1,7 +1,7 @@
 package models
 
 import (
-	"books_catalog_go/types"
+	"books_catalog_go/dto"
 	u "books_catalog_go/utils"
 	"fmt"
 
@@ -15,7 +15,7 @@ type Author struct {
 	Middlename string
 	BirthYear  uint
 	DeathYear  uint
-	Books      []*Book `json:"-"`//`gorm:"many2many:authors_books;"`
+	Books      []*Book `json:"-" gorm:"many2many:authors_books;foreignKey:ID;joinForeignKey:AuthorID;References:ID;JoinReferences:BookID"` //`gorm:"many2many:authors_books;"`
 	BooksCount uint
 }
 
@@ -46,30 +46,25 @@ func GetAuthor(id uint) *Author {
 	if err != nil {
 		return nil
 	}
-	author.setBooksCount()
 	return author
 }
 
 func GetAuthors() []*Author {
 	authors := make([]*Author, 0)
-	err := GetDB().Table("authors").Preload("Books").Find(&authors).Error
+	err := GetDB().Preload("Books").Find(&authors).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	for _, author := range authors {
-		author.setBooksCount()
-	}
-
 	return authors
 }
 
-func GetAuthorsWithSearch(authorCondition *types.AuthorCondition) []*Author {
+func GetAuthorsWithSearch(authorCondition *dto.AuthorCondition) []*Author {
 	authors := make([]*Author, 0)
-	db := GetDB().Table("authors").
-		//Select("authors.*, count(distinct books.id) as books_count").
-		Joins("left join books on authors.id = books.author_id").
+	db := GetDB().Debug().
+		Joins("INNER JOIN authors_books ON authors_books.author_id = authors.id").
+		Joins("LEFT JOIN books ON authors_books.book_id = books.id").
 		Preload("Books").
 		Group("authors.id")
 
@@ -87,13 +82,14 @@ func GetAuthorsWithSearch(authorCondition *types.AuthorCondition) []*Author {
 		return nil
 	}
 
-	for _, author := range authors {
-		author.setBooksCount()
-	}
-
 	return authors
 }
 
 func (author *Author) setBooksCount() {
 	author.BooksCount = uint(len(author.Books))
+}
+
+func (author *Author) AfterFind(tx *gorm.DB) (err error) {
+	author.setBooksCount()
+	return
 }

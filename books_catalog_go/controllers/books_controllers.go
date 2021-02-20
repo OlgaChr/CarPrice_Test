@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"books_catalog_go/types"
+	"books_catalog_go/dto"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -81,7 +81,7 @@ var GetBooks = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var GetBooksWithSearch = func(w http.ResponseWriter, r *http.Request) {
-	bookCondition := &types.BookCondition{}
+	bookCondition := &dto.BookCondition{}
 	err := json.NewDecoder(r.Body).Decode(bookCondition)
 	if err != nil {
 		u.Respond(w, u.Message(false, "Error while decoding request body"))

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"books_catalog_go/types"
+	"books_catalog_go/dto"
 	u "books_catalog_go/utils"
 	"fmt"
 
@@ -13,7 +13,7 @@ type Book struct {
 	Name            string
 	PublicationYear uint
 	Summary         string
-	AuthorID        *uint //[]*Author `gorm:"many2many:authors_books;"`
+	Authors         []*Author `gorm:"many2many:authors_books;"` //*uint
 }
 
 func (book *Book) Create() map[string]interface{} {
@@ -48,7 +48,7 @@ func GetBook(id uint) *Book {
 
 func GetBooks() []*Book {
 	books := make([]*Book, 0)
-	err := GetDB().Table("books").Find(&books).Error
+	err := GetDB().Preload("Authors").Find(&books).Error
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -57,12 +57,16 @@ func GetBooks() []*Book {
 	return books
 }
 
-func GetBooksWithSearch(bookCondition *types.BookCondition) []*Book {
+func GetBooksWithSearch(bookCondition *dto.BookCondition) []*Book {
 	books := make([]*Book, 0)
-	db := GetDB().Table("books")
+	db := GetDB().
+		Joins("INNER JOIN authors_books ON authors_books.book_id = books.id").
+		Joins("LEFT JOIN authors ON authors_books.author_id = authors.id").
+		Preload("Authors").
+		Group("books.id")
 
 	if bookCondition.AuthorID > 0 {
-		db = db.Where("author_id = ?", bookCondition.AuthorID)
+		db = db.Where("authors.id = ?", bookCondition.AuthorID)
 	}
 	if bookCondition.Page > 0 && bookCondition.Size > 0 {
 		offset := (bookCondition.Page - 1) * bookCondition.Size
