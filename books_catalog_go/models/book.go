@@ -13,7 +13,7 @@ type Book struct {
 	Name            string
 	PublicationYear uint
 	Summary         string
-	Authors         []*Author `gorm:"many2many:authors_books;"` //*uint
+	Authors         []*Author `gorm:"many2many:authors_books;"`
 }
 
 func (book *Book) Create() map[string]interface{} {
