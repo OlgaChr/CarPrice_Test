@@ -15,7 +15,7 @@ type Author struct {
 	Middlename string
 	BirthYear  uint
 	DeathYear  uint
-	Books      []*Book `json:"-" gorm:"many2many:authors_books;foreignKey:ID;joinForeignKey:AuthorID;References:ID;JoinReferences:BookID"` //`gorm:"many2many:authors_books;"`
+	Books      []*Book `json:"-" gorm:"many2many:authors_books;foreignKey:ID;joinForeignKey:AuthorID;References:ID;JoinReferences:BookID"`
 	BooksCount uint
 }
 
@@ -62,7 +62,7 @@ func GetAuthors() []*Author {
 
 func GetAuthorsWithSearch(authorCondition *dto.AuthorCondition) []*Author {
 	authors := make([]*Author, 0)
-	db := GetDB().Debug().
+	db := GetDB().
 		Joins("INNER JOIN authors_books ON authors_books.author_id = authors.id").
 		Joins("LEFT JOIN books ON authors_books.book_id = books.id").
 		Preload("Books").

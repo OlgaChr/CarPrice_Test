@@ -39,7 +39,7 @@ func DeleteBook(id uint) error {
 
 func GetBook(id uint) *Book {
 	book := &Book{}
-	err := GetDB().Table("books").Where("id = ?", id).First(book).Error
+	err := GetDB().Preload("Authors").Where("id = ?", id).First(book).Error
 	if err != nil {
 		return nil
 	}
