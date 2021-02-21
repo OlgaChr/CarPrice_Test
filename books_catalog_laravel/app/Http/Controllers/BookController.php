@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class BookController extends Controller
 {
@@ -35,13 +37,17 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
         $authors = $request->get('authors');
-        $book = Book::create($request->except(['authors'])/*->validated()*/);
+        if (!$authors || !is_array($authors)) {
+            throw ValidationException::withMessages(['authors' => 'This value required, type = array of ids']);
+        }
+        $book = Book::create($request->except(['authors']));
         $book->authors()->attach($authors);
         return $book;
     }
@@ -64,7 +70,7 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Book $book)
+    public function update(BookRequest $request, Book $book)
     {
         $authors = $request->get('authors');
         $book->update($request->except(['authors']));
@@ -75,8 +81,9 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Book  $book
+     * @param \App\Models\Book $book
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Book $book)
     {

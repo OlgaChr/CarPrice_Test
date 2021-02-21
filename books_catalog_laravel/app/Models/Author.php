@@ -22,7 +22,7 @@ class Author extends Model
             'book_id');
     }
 
-    public function getBooksCountAttribute(): int
+    public function getBooksCountAttribute()
     {
         return $this->books()->count();
     }

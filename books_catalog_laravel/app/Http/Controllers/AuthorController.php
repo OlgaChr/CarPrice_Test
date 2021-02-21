@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthorRequest;
 use App\Models\Author;
 use Illuminate\Http\Request;
 
@@ -38,10 +39,9 @@ class AuthorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AuthorRequest $request)
     {
-        $author = Author::create($request->all()/*->validated()*/);
-        return $author;
+        return Author::create($request->all());
     }
 
     /**
@@ -62,10 +62,8 @@ class AuthorController extends Controller
      * @param  \App\Models\Author  $author
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Author $author)
+    public function update(AuthorRequest $request, Author $author)
     {
-//        $author->fill($request->except(['id']));
-//        $author->save();
         $author->update($request->all());
         return $author;
     }

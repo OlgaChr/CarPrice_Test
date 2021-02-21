@@ -20,7 +20,6 @@ class CreateAuthorsTable extends Migration
             $table->string('middlename')->nullable();
             $table->year('birth_year');
             $table->year('death_year')->nullable();
-//            $table->unsignedInteger('books_count');
             $table->timestamps();
         });
     }
