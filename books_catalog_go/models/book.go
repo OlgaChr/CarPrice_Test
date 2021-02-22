@@ -16,7 +16,29 @@ type Book struct {
 	Authors         []*Author `gorm:"many2many:authors_books;"`
 }
 
+func (book *Book) Validate() (map[string]interface{}, bool) {
+
+	if book.Name == "" {
+		return u.Message(false, "Book name should be on the payload"), false
+	}
+
+	if book.PublicationYear == 0 {
+		return u.Message(false, "Publication Year should be on the payload"), false
+	}
+
+	if len(book.Authors) == 0 {
+		return u.Message(false, "Authors should be on the payload"), false
+	}
+
+	//Все обязательные параметры присутствуют
+	return u.Message(true, "success"), true
+}
+
 func (book *Book) Create() map[string]interface{} {
+	if resp, ok := book.Validate(); !ok {
+		return resp
+	}
+
 	GetDB().Create(book)
 
 	resp := u.Message(true, "success")
@@ -25,10 +47,14 @@ func (book *Book) Create() map[string]interface{} {
 }
 
 func (book *Book) Update() map[string]interface{} {
+	if resp, ok := book.Validate(); !ok {
+		return resp
+	}
+
 	GetDB().Model(&book).Update(book)
 
 	resp := u.Message(true, "success")
-	resp["author"] = book
+	resp["book"] = book
 	return resp
 }
 

@@ -19,7 +19,29 @@ type Author struct {
 	BooksCount uint
 }
 
+func (author *Author) Validate() (map[string]interface{}, bool) {
+
+	if author.Name == "" {
+		return u.Message(false, "Author name should be on the payload"), false
+	}
+
+	if author.Surname == "" {
+		return u.Message(false, "Author surname should be on the payload"), false
+	}
+
+	if author.BirthYear == 0 {
+		return u.Message(false, "Birth Year should be on the payload"), false
+	}
+
+	//Все обязательные параметры присутствуют
+	return u.Message(true, "success"), true
+}
+
 func (author *Author) Create() map[string]interface{} {
+	if resp, ok := author.Validate(); !ok {
+		return resp
+	}
+
 	GetDB().Create(author)
 
 	resp := u.Message(true, "success")
@@ -28,6 +50,10 @@ func (author *Author) Create() map[string]interface{} {
 }
 
 func (author *Author) Update() map[string]interface{} {
+	if resp, ok := author.Validate(); !ok {
+		return resp
+	}
+
 	GetDB().Model(&author).Update(author)
 
 	resp := u.Message(true, "success")
